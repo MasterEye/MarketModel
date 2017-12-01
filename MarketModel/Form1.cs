@@ -47,9 +47,50 @@ namespace MarketModel
 
             while (exchangeCyc >= 0 && exchangeNumber <= totalExchangeNumber)
             {
-
+                Random ran = new Random(inventoryNumber);  
+                ran.Next(leastExchange, inventoryNumber);
                 exchangeCyc--;
             }
+        }
+
+        private bool randomInitial(int inventoryNumber, int leastExchange, int totalPersonNumber, Oper[] oper_list)
+        {
+            int sum = 0;
+            int divide = 0;
+
+            divide = System.Int32.Parse((inventoryNumber / totalPersonNumber).ToString());
+            divide = inventoryNumber / totalPersonNumber;
+
+            for (int i = 0; i < totalPersonNumber; i = i+2 )
+            {
+                int value = 0;
+                int next = 0;
+                Random ran = new Random(divide);
+
+                try
+                {
+                    value = ran.Next(leastExchange, divide);
+                }
+                catch
+                {
+                    
+                }
+
+                next = divide * 2 - value;
+                oper_list[i].set_Inventory_Number(value);
+                oper_list[i + 1].set_Inventory_Number(next);
+                sum = value + next;
+            }
+
+            if (sum == inventoryNumber)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
         }
 
     }
