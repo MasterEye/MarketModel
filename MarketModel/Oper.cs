@@ -8,12 +8,12 @@ namespace MarketModel
 {
     class Oper
     {
-        private int inventory_number;
-        private int least_price;
-        private double cash;
-        private int exchange_number;
-        private double exchange_rate;
-        private double security_deposit;
+        private int inventory_number { get; set; }
+        private int least_price { get; set; }
+        private double cash { get; set; }
+        private int exchange_number { get; set; }
+        private double exchange_rate { get; set; }
+        private double security_deposit { get; set; }
 
         public void set_Inventory_Number(int Inventory_Number)
         {
@@ -33,6 +33,11 @@ namespace MarketModel
         public void set_Security_Deposit(double Security_Deposit)
         {
             security_deposit = Security_Deposit;
+        }
+
+        public void buy_Inventory(int inventory)
+        {
+            inventory_number = inventory_number + inventory;
         }
 
         public int get_Inventory_Number()
