@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Forms.DataVisualization.Charting;
 
 namespace MarketModel
 {
@@ -47,12 +48,14 @@ namespace MarketModel
 
             Oper[] oper_list = new Oper[totalPersonNumber];
 
+            exchangeIncome = 0;
+
             // Initial Oper list
-            randomInitial(inventoryNumber, leastExchange, totalPersonNumber, leastExchange, oper_list);
+            randomInitial(inventoryNumber, leastExchange, totalPersonNumber, initPrice, oper_list);
 
             int cyc = exchangeCyc;
 
-            while (cyc >= 0 && exchangeNumber <= totalExchangeNumber)
+            while (cyc > 0 && exchangeNumber <= totalExchangeNumber)
             {
                 if(cyc == exchangeCyc)
                 {
@@ -67,8 +70,28 @@ namespace MarketModel
 
             }
 
-            this.lbl_price.Text = exchangeEndPrice_list[exchangeCyc].ToString();
+            this.lbl_price.Text = exchangeEndPrice_list[exchangeCyc - 1].ToString();
             this.lbl_income.Text = exchangeIncome.ToString();
+
+            // 画图操作
+            chart1.Series.Clear();  // 清除默认的series
+            Series exchangeStartPrice = new Series("开盘价格");
+            Series exchangeEndPrice = new Series("收盘价格");
+
+            exchangeStartPrice.ChartType = SeriesChartType.Spline;
+            exchangeStartPrice.IsValueShownAsLabel = true;
+            exchangeEndPrice.ChartType = SeriesChartType.Spline;
+            exchangeEndPrice.IsValueShownAsLabel = true;
+
+            for (int day = 0; day < exchangeCyc; day++)
+            {
+                exchangeEndPrice.Points.AddXY(day, exchangeEndPrice_list[day]);
+                exchangeStartPrice.Points.AddXY(day, exchangeStartPrice_lsit[day]);
+            }
+
+            chart1.Series.Add(exchangeStartPrice);
+            chart1.Series.Add(exchangeEndPrice);
+
         }
 
         private bool randomInitial(int inventoryNumber, int leastExchange, int totalPersonNumber, int inititalPrice, Oper[] oper_list)
@@ -155,12 +178,21 @@ namespace MarketModel
                 {
                     Random ran_check = new Random();
                     int inventory = oper_list[(int)hashtable[i]].get_Inventory_Number();
-                    if (leastExchange < inventory && ran_check.Next(100) > 50) //ran_check > 50 参与交易，ran_check <=50 不参与交易。
+                    if (leastExchange < inventory && ran_check.Next(0,100) > 20) //ran_check > 30 参与交易，ran_check <=30 不参与交易。
                     {
                         Random r1 = new Random();   //在最小交易手数 - 持仓总数中的随机数
                         int value = r1.Next(leastExchange, inventory);
                         oper_list[(int)hashtable[i]].set_Inventory_Number(inventory - value);
-                        int price = oper_list[(int)hashtable[i]].get_Least_Price() + leastPrice;
+                        Random r3 = new Random();
+                        int price;
+                        if (r3.Next(0,100) > 20)
+                        {
+                            price = oper_list[(int)hashtable[i]].get_Least_Price() + leastPrice;
+                        }
+                        else
+                        {
+                            price = oper_list[(int)hashtable[i]].get_Least_Price() - leastPrice;
+                        }
                         Random r2 = new Random();   //在操盘手的编号中进行随机数
                         int indexK;
                         do
@@ -181,6 +213,5 @@ namespace MarketModel
             }
             return exchangeEndPrice;
         }
-
     }
 }
