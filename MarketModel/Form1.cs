@@ -187,11 +187,11 @@ namespace MarketModel
                         double price;
                         if (r3.Next(0,100) > 50)
                         {
-                            price = oper_list[(int)hashtable[i]].get_Least_Price() * ( 1 + exchangeRate );
+                            price = Convert.ToDouble((oper_list[(int)hashtable[i]].get_Least_Price() * ( 1 + exchangeRate )).ToString("N3"));
                         }
                         else
                         {
-                            price = oper_list[(int)hashtable[i]].get_Least_Price() * ( 1 - exchangeRate );
+                            price = Convert.ToDouble((oper_list[(int)hashtable[i]].get_Least_Price() * ( 1 - exchangeRate )).ToString("N3"));
                         }
                         Random r2 = new Random();   //在操盘手的编号中进行随机数
                         int indexK;
@@ -199,13 +199,13 @@ namespace MarketModel
                         {
                             indexK = r2.Next(totalPersonNumber);
                         }
-                        while ((int)hashtable[i] != indexK);
+                        while ((int)hashtable[i] == indexK);
                         // 这个判断做的是保证价格在熔断范围内，一旦超出终止交易
                         if (price < exchangeStartPrice * (1 + leastPriceRate) && price > exchangeStartPrice * (1 - leastPriceRate))
                         {
                             oper_list[indexK].buy_Inventory(value);
-                            oper_list[(int)hashtable[i]].set_Least_Price(price);
-                            exchangeIncome = exchangeIncome + price * exchangeRate;
+                            oper_list[indexK].set_Least_Price(price);
+                            exchangeIncome = Convert.ToDouble((exchangeIncome + price * exchangeRate).ToString("N3"));
                             exchangeEndPrice = price;
                             exchangeNumber++;
                         }

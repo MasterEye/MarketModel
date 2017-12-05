@@ -369,7 +369,7 @@
             series1.Legend = "Legend1";
             series1.Name = "Series1";
             this.chart1.Series.Add(series1);
-            this.chart1.Size = new System.Drawing.Size(623, 557);
+            this.chart1.Size = new System.Drawing.Size(843, 557);
             this.chart1.TabIndex = 32;
             this.chart1.Text = "chart1";
             this.chart1.Click += new System.EventHandler(this.button1_Click);
@@ -378,7 +378,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1045, 581);
+            this.ClientSize = new System.Drawing.Size(1265, 581);
             this.Controls.Add(this.chart1);
             this.Controls.Add(this.lbl_income);
             this.Controls.Add(this.lbl_price);
