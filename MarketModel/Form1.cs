@@ -24,6 +24,7 @@ namespace MarketModel
         double exchangeRate;        // 交易费率
         int exchangeFreqByMinite;   // 最小交易周期，以分为单位
         double exchangeIncome;      // 交易金收入 ∑（exchangeIncome × exchangeRate）
+        int exchangeNumber; // 交易手数计数
 
         public Form1()
         {
@@ -42,12 +43,12 @@ namespace MarketModel
             exchangeRate = double.Parse(this.tBox_exchangeRate.Text) / 100;
             exchangeFreqByMinite = int.Parse(this.tBox_ExchangeFreq.Text);
 
-            int exchangeNumber = 0; // 交易手数计数
+            
             int[] exchangeEndPrice_list = new int[exchangeCyc];   // 头日收盘价格数组
             int[] exchangeStartPrice_lsit = new int[exchangeCyc]; // 次日开盘价格
 
             Oper[] oper_list = new Oper[totalPersonNumber];
-
+            exchangeNumber = 0;
             exchangeIncome = 0;
 
             // Initial Oper list
@@ -204,6 +205,7 @@ namespace MarketModel
                         oper_list[(int)hashtable[i]].set_Least_Price(price);
                         exchangeIncome = exchangeIncome + price * exchangeRate;
                         exchangeEndPrice = price;
+                        exchangeNumber++;
                     }
                     else
                     {
