@@ -9,7 +9,7 @@ namespace MarketModel
     class Oper
     {
         private int inventory_number { get; set; }
-        private int least_price { get; set; }
+        private double least_price { get; set; }
         private double cash { get; set; }
         private int exchange_number { get; set; }
         private double exchange_rate { get; set; }
@@ -20,7 +20,7 @@ namespace MarketModel
             inventory_number = Inventory_Number;
         }
 
-        public void set_Least_Price(int Least_Price)
+        public void set_Least_Price(double Least_Price)
         {
             least_price = Least_Price;
         }
@@ -45,7 +45,7 @@ namespace MarketModel
             return inventory_number;
         }
 
-        public int get_Least_Price()
+        public double get_Least_Price()
         {
             return least_price;
         }

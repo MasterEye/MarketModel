@@ -15,7 +15,7 @@ namespace MarketModel
     public partial class Form1 : Form
     {
         int initPrice;              // 交易初始价格
-        int leastPrice;             // 最低交易价格
+        double leastPriceRate;      // 最低交易价格
         int totalPersonNumber;      // 操盘手人数
         int totalExchangeNumber;    // 总交易手数
         int exchangeCyc;            // 交易周期
@@ -24,7 +24,7 @@ namespace MarketModel
         double exchangeRate;        // 交易费率
         int exchangeFreqByMinite;   // 最小交易周期，以分为单位
         double exchangeIncome;      // 交易金收入 ∑（exchangeIncome × exchangeRate）
-        int exchangeNumber; // 交易手数计数
+        int exchangeNumber;         // 交易手数计数
 
         public Form1()
         {
@@ -34,7 +34,7 @@ namespace MarketModel
         private void button1_Click(object sender, EventArgs e)
         {
             initPrice = int.Parse(this.tBox_initialPrice.Text);
-            leastPrice = int.Parse(this.tBox_leastPrice.Text);
+            leastPriceRate = double.Parse(this.tBox_leastPriceRate.Text) / 100;
             totalPersonNumber = int.Parse(this.tbox_totalPersonNumber.Text);
             totalExchangeNumber = int.Parse(this.tbox_totalExchangeNumber.Text);
             exchangeCyc = int.Parse(this.tBox_exchangeCyc.Text);
@@ -44,8 +44,8 @@ namespace MarketModel
             exchangeFreqByMinite = int.Parse(this.tBox_ExchangeFreq.Text);
 
             
-            int[] exchangeEndPrice_list = new int[exchangeCyc];   // 头日收盘价格数组
-            int[] exchangeStartPrice_lsit = new int[exchangeCyc]; // 次日开盘价格
+            double[] exchangeEndPrice_list = new double[exchangeCyc];   // 头日收盘价格数组
+            double[] exchangeStartPrice_lsit = new double[exchangeCyc]; // 次日开盘价格
 
             Oper[] oper_list = new Oper[totalPersonNumber];
             exchangeNumber = 0;
@@ -60,13 +60,13 @@ namespace MarketModel
             {
                 if(cyc == exchangeCyc)
                 {
-                    exchangeStartPrice_lsit[exchangeCyc - cyc] = 0;
+                    exchangeStartPrice_lsit[exchangeCyc - cyc] = initPrice;
                 }
                 else
                 {
                     exchangeStartPrice_lsit[exchangeCyc - cyc] = exchangeEndPrice_list[exchangeCyc- 1 - cyc];
                 }
-                exchangeEndPrice_list[exchangeCyc - cyc] = exchangeByday(leastPrice, leastPrice, totalPersonNumber, exchangeFreqByMinite, oper_list);
+                exchangeEndPrice_list[exchangeCyc - cyc] = exchangeByday(leastExchange, leastPriceRate, totalPersonNumber, exchangeFreqByMinite, exchangeStartPrice_lsit[exchangeCyc - cyc], oper_list);
                 cyc--;
 
             }
@@ -102,13 +102,12 @@ namespace MarketModel
 
             divide = int.Parse((inventoryNumber / totalPersonNumber).ToString());
             divide = inventoryNumber / totalPersonNumber;
-
+            Random ran = new Random();
             for (int i = 0; i < totalPersonNumber; i = i+2 )
             {
                 int value = 0;
                 int next = 0;
-                Random ran = new Random();
-
+                
                 try
                 {
                     value = ran.Next(leastExchange, divide);
@@ -148,14 +147,13 @@ namespace MarketModel
         /// <param name="exchangeFreq">最小交易周期，如exchangeFreqByMinite相同</param>
         /// <param name="oper_list">操盘手的集合</param>
         /// <returns></returns>
-        private int exchangeByday(int leastExchange,int leastPrice, int totalPersonNumber, int exchangeFreq, Oper[] oper_list)
+        private double exchangeByday(int leastExchange,double leastPriceRate, int totalPersonNumber, int exchangeFreq, double exchangeStartPrice, Oper[] oper_list)
         {
             int exchangeTimeinDay = 8;
 
-            int freq = 60 / exchangeFreq * exchangeTimeinDay;
+            int freq = 60 / exchangeFreq * exchangeTimeinDay; //exchangeFreq以分钟计算结果。每分钟几次流转exchangeTimeinDay,每天交易的时间
 
-            int exchangeEndPrice = 0;
-            //int exchangeStartPrice = 0;
+            double exchangeEndPrice = 0;
 
             for (int f=0; f < freq; f++)
             {
@@ -173,26 +171,27 @@ namespace MarketModel
 
                     hashtable.Add(i, value);
                 }
-                //TODO 货物数字要开始流转，必须要遵守规则。
+                // 货物数字要开始流转，必须要遵守规则。
 
                 for (int i = 0; i < totalPersonNumber; i++)
                 {
                     Random ran_check = new Random();
                     int inventory = oper_list[(int)hashtable[i]].get_Inventory_Number();
-                    if (leastExchange < inventory && ran_check.Next(0,100) > 20) //ran_check > 30 参与交易，ran_check <=30 不参与交易。
+                    int v = ran_check.Next(100);
+                    if (leastExchange < inventory && v > 30) //ran_check > 30 参与交易，ran_check <=30 不参与交易。
                     {
                         Random r1 = new Random();   //在最小交易手数 - 持仓总数中的随机数
                         int value = r1.Next(leastExchange, inventory);
                         oper_list[(int)hashtable[i]].set_Inventory_Number(inventory - value);
                         Random r3 = new Random();
-                        int price;
-                        if (r3.Next(0,100) > 20)
+                        double price;
+                        if (r3.Next(0,100) > 50)
                         {
-                            price = oper_list[(int)hashtable[i]].get_Least_Price() + leastPrice;
+                            price = oper_list[(int)hashtable[i]].get_Least_Price() * ( 1 + exchangeRate );
                         }
                         else
                         {
-                            price = oper_list[(int)hashtable[i]].get_Least_Price() - leastPrice;
+                            price = oper_list[(int)hashtable[i]].get_Least_Price() * ( 1 - exchangeRate );
                         }
                         Random r2 = new Random();   //在操盘手的编号中进行随机数
                         int indexK;
@@ -201,11 +200,20 @@ namespace MarketModel
                             indexK = r2.Next(totalPersonNumber);
                         }
                         while ((int)hashtable[i] != indexK);
-                        oper_list[indexK].buy_Inventory(value);
-                        oper_list[(int)hashtable[i]].set_Least_Price(price);
-                        exchangeIncome = exchangeIncome + price * exchangeRate;
-                        exchangeEndPrice = price;
-                        exchangeNumber++;
+                        // 这个判断做的是保证价格在熔断范围内，一旦超出终止交易
+                        if (price < exchangeStartPrice * (1 + leastPriceRate) && price > exchangeStartPrice * (1 - leastPriceRate))
+                        {
+                            oper_list[indexK].buy_Inventory(value);
+                            oper_list[(int)hashtable[i]].set_Least_Price(price);
+                            exchangeIncome = exchangeIncome + price * exchangeRate;
+                            exchangeEndPrice = price;
+                            exchangeNumber++;
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                        
                     }
                     else
                     {

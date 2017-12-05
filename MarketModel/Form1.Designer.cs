@@ -43,7 +43,7 @@
             this.tBox_initialPrice = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
-            this.tBox_leastPrice = new System.Windows.Forms.TextBox();
+            this.tBox_leastPriceRate = new System.Windows.Forms.TextBox();
             this.tBox_leastExchange = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
             this.label8 = new System.Windows.Forms.Label();
@@ -158,9 +158,9 @@
             this.label6.Font = new System.Drawing.Font("微软雅黑", 10.5F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.label6.Location = new System.Drawing.Point(49, 228);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(107, 19);
+            this.label6.Size = new System.Drawing.Size(65, 19);
             this.label6.TabIndex = 10;
-            this.label6.Text = "最低交易价格：";
+            this.label6.Text = "熔断率：";
             // 
             // label7
             // 
@@ -172,12 +172,12 @@
             this.label7.TabIndex = 11;
             this.label7.Text = "最低交易手数：";
             // 
-            // tBox_leastPrice
+            // tBox_leastPriceRate
             // 
-            this.tBox_leastPrice.Location = new System.Drawing.Point(176, 225);
-            this.tBox_leastPrice.Name = "tBox_leastPrice";
-            this.tBox_leastPrice.Size = new System.Drawing.Size(140, 21);
-            this.tBox_leastPrice.TabIndex = 12;
+            this.tBox_leastPriceRate.Location = new System.Drawing.Point(176, 225);
+            this.tBox_leastPriceRate.Name = "tBox_leastPriceRate";
+            this.tBox_leastPriceRate.Size = new System.Drawing.Size(140, 21);
+            this.tBox_leastPriceRate.TabIndex = 12;
             // 
             // tBox_leastExchange
             // 
@@ -247,9 +247,9 @@
             this.label13.AutoSize = true;
             this.label13.Location = new System.Drawing.Point(334, 233);
             this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(35, 12);
+            this.label13.Size = new System.Drawing.Size(11, 12);
             this.label13.TabIndex = 20;
-            this.label13.Text = "元/手";
+            this.label13.Text = "%";
             // 
             // label14
             // 
@@ -300,7 +300,7 @@
             // tBox_ExchangeFreq
             // 
             this.tBox_ExchangeFreq.Location = new System.Drawing.Point(176, 341);
-            this.tBox_ExchangeFreq.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.tBox_ExchangeFreq.Margin = new System.Windows.Forms.Padding(2);
             this.tBox_ExchangeFreq.Name = "tBox_ExchangeFreq";
             this.tBox_ExchangeFreq.Size = new System.Drawing.Size(140, 21);
             this.tBox_ExchangeFreq.TabIndex = 23;
@@ -399,7 +399,7 @@
             this.Controls.Add(this.label8);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.tBox_leastExchange);
-            this.Controls.Add(this.tBox_leastPrice);
+            this.Controls.Add(this.tBox_leastPriceRate);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.label6);
             this.Controls.Add(this.tBox_initialPrice);
@@ -434,7 +434,7 @@
         private System.Windows.Forms.TextBox tBox_initialPrice;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.TextBox tBox_leastPrice;
+        private System.Windows.Forms.TextBox tBox_leastPriceRate;
         private System.Windows.Forms.TextBox tBox_leastExchange;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label label8;
