@@ -26,6 +26,8 @@ namespace MarketModel
         double exchangeIncome;      // 交易金收入 ∑（exchangeIncome × exchangeRate）
         int exchangeNumber;         // 交易手数计数
 
+        Dictionary<int, List<double>> exchangeHistroy = new Dictionary<int, List<double>>();
+
         public Form1()
         {
             InitializeComponent();
@@ -43,6 +45,10 @@ namespace MarketModel
             exchangeRate = double.Parse(this.tBox_exchangeRate.Text) / 100;
             exchangeFreqByMinite = int.Parse(this.tBox_ExchangeFreq.Text);
 
+            for (int i = 0; i < exchangeCyc; i++)
+            {
+                cBox_Cyc.Items.Add(i + 1);
+            }
             
             double[] exchangeEndPrice_list = new double[exchangeCyc];   // 头日收盘价格数组
             double[] exchangeStartPrice_lsit = new double[exchangeCyc]; // 次日开盘价格
@@ -51,6 +57,7 @@ namespace MarketModel
             exchangeNumber = 0;
             exchangeIncome = 0;
 
+            exchangeHistroy.Clear();
             // Initial Oper list
             randomInitial(inventoryNumber, leastExchange, totalPersonNumber, initPrice, oper_list);
 
@@ -66,7 +73,7 @@ namespace MarketModel
                 {
                     exchangeStartPrice_lsit[exchangeCyc - cyc] = exchangeEndPrice_list[exchangeCyc- 1 - cyc];
                 }
-                exchangeEndPrice_list[exchangeCyc - cyc] = exchangeByday(leastExchange, leastPriceRate, totalPersonNumber, exchangeFreqByMinite, exchangeStartPrice_lsit[exchangeCyc - cyc], oper_list);
+                exchangeEndPrice_list[exchangeCyc - cyc] = exchangeByday(leastExchange, leastPriceRate, totalPersonNumber, exchangeFreqByMinite, exchangeStartPrice_lsit[exchangeCyc - cyc], cyc, oper_list);
                 cyc--;
 
             }
@@ -74,7 +81,7 @@ namespace MarketModel
             this.lbl_price.Text = exchangeEndPrice_list[exchangeCyc - 1].ToString();
             this.lbl_income.Text = exchangeIncome.ToString();
 
-            // 画图操作
+            // 画图操作 开盘价格与收盘价格
             chart1.Series.Clear();  // 清除默认的series
             Series exchangeStartPrice = new Series("开盘价格");
             Series exchangeEndPrice = new Series("收盘价格");
@@ -93,6 +100,17 @@ namespace MarketModel
             chart1.Series.Add(exchangeStartPrice);
             chart1.Series.Add(exchangeEndPrice);
 
+            // 日交易变化情况
+            chart2.Series.Clear();
+            Series ex = new Series("交易价格");
+
+            ex.ChartType = SeriesChartType.Spline;
+            ex.IsValueShownAsLabel = true;
+
+            for (int time = 0;time < exchangeHistroy[1].Count;time++)
+            {
+                ex.Points.AddY(exchangeHistroy[1][time]);
+            }
         }
 
         private bool randomInitial(int inventoryNumber, int leastExchange, int totalPersonNumber, int inititalPrice, Oper[] oper_list)
@@ -147,15 +165,16 @@ namespace MarketModel
         /// <param name="exchangeFreq">最小交易周期，如exchangeFreqByMinite相同</param>
         /// <param name="oper_list">操盘手的集合</param>
         /// <returns></returns>
-        private double exchangeByday(int leastExchange,double leastPriceRate, int totalPersonNumber, int exchangeFreq, double exchangeStartPrice, Oper[] oper_list)
+        private double exchangeByday(int leastExchange, double leastPriceRate, int totalPersonNumber, int exchangeFreq, double exchangeStartPrice,int Cyc, Oper[] oper_list)
         {
             int exchangeTimeinDay = 8;
 
             int freq = 60 / exchangeFreq * exchangeTimeinDay; //exchangeFreq以分钟计算结果。每分钟几次流转exchangeTimeinDay,每天交易的时间
 
             double exchangeEndPrice = 0;
+            List<double> price_list = new List<double>();
 
-            for (int f=0; f < freq; f++)
+            for (int f = 0; f < freq; f++)
             {
                 // 0 - totalPersonNumber中的随机数，并保存在hashtable中。
                 Hashtable hashtable = new Hashtable();
@@ -185,13 +204,13 @@ namespace MarketModel
                         oper_list[(int)hashtable[i]].set_Inventory_Number(inventory - value);
                         Random r3 = new Random();
                         double price;
-                        if (r3.Next(0,100) > 50)
+                        if (r3.Next(0, 100) > 50)
                         {
-                            price = Convert.ToDouble((oper_list[(int)hashtable[i]].get_Least_Price() * ( 1 + exchangeRate )).ToString("N3"));
+                            price = Convert.ToDouble((oper_list[(int)hashtable[i]].get_Least_Price() * (1 + exchangeRate)).ToString("N3"));
                         }
                         else
                         {
-                            price = Convert.ToDouble((oper_list[(int)hashtable[i]].get_Least_Price() * ( 1 - exchangeRate )).ToString("N3"));
+                            price = Convert.ToDouble((oper_list[(int)hashtable[i]].get_Least_Price() * (1 - exchangeRate)).ToString("N3"));
                         }
                         Random r2 = new Random();   //在操盘手的编号中进行随机数
                         int indexK;
@@ -206,6 +225,7 @@ namespace MarketModel
                             oper_list[indexK].buy_Inventory(value);
                             oper_list[indexK].set_Least_Price(price);
                             exchangeIncome = Convert.ToDouble((exchangeIncome + price * exchangeRate).ToString("N3"));
+                            price_list.Add(price);
                             exchangeEndPrice = price;
                             exchangeNumber++;
                         }
@@ -213,15 +233,27 @@ namespace MarketModel
                         {
                             continue;
                         }
-                        
+
                     }
                     else
                     {
                         continue;
                     }
                 }
+
+                hashtable.Clear();
             }
-            return exchangeEndPrice;
+
+            exchangeHistroy.Add(Cyc + 1,price_list);
+
+            if (exchangeEndPrice == 0.000)
+            {
+                return exchangeEndPrice = exchangeStartPrice;
+            }
+            else
+            {
+                return exchangeEndPrice;
+            }
         }
     }
 }
