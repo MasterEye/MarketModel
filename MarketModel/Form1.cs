@@ -105,12 +105,28 @@ namespace MarketModel
             Series ex = new Series("交易价格");
 
             ex.ChartType = SeriesChartType.Spline;
-            ex.IsValueShownAsLabel = true;
+            //ex.IsValueShownAsLabel = true;
 
             for (int time = 0;time < exchangeHistroy[1].Count;time++)
             {
-                ex.Points.AddY(exchangeHistroy[1][time]);
+                ex.Points.AddXY(time, exchangeHistroy[1][time]);
             }
+            chart2.Series.Add(ex);
+        }
+
+        private void cBox_selectedChange(object sender, EventArgs e)
+        {
+            chart2.Series.Clear();
+            Series ex = new Series("交易价格");
+
+            ex.ChartType = SeriesChartType.Spline;
+            //ex.IsValueShownAsLabel = true;
+            int index = int.Parse(this.cBox_Cyc.SelectedItem.ToString());
+            for (int time = 0; time < exchangeHistroy[index].Count; time++)
+            {
+                ex.Points.AddY(exchangeHistroy[index][time]);
+            }
+            chart2.Series.Add(ex);
         }
 
         private bool randomInitial(int inventoryNumber, int leastExchange, int totalPersonNumber, int inititalPrice, Oper[] oper_list)
@@ -244,7 +260,7 @@ namespace MarketModel
                 hashtable.Clear();
             }
 
-            exchangeHistroy.Add(Cyc + 1,price_list);
+            exchangeHistroy.Add(Cyc, price_list);
 
             if (exchangeEndPrice == 0.000)
             {
